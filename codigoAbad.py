@@ -1,3 +1,4 @@
+#interfaz de A
 import tkinter as tk
 from tkinter import ttk, messagebox
 from database import guardar_item, traer_items, borrar_item, existe_item
