@@ -3,21 +3,19 @@ import pyodbc
 # 1. CONFIGURACIÓN DE LA CONEXIÓN
 def conectar():
     try:
-        # Usamos localhost porque tu instancia es la principal (MSSQLSERVER)
-        # Añadimos TrustServerCertificate y Encrypt para evitar bloqueos de SSL
+        # El Driver 17 es mucho más estable para instancias locales
         conn = pyodbc.connect(
             "DRIVER={ODBC Driver 17 for SQL Server};"
-            "SERVER=localhost;"
-            "DATABASE=TransporteDB;"
+            "SERVER=localhost;" 
+            "DATABASE=transporte_db;"
             "Trusted_Connection=yes;"
             "Encrypt=no;"
             "TrustServerCertificate=yes;"
         )
         return conn
     except Exception as e:
-        print(f"Error crítico de conexión: {e}")
+        print(f"Error de conexión: {e}")
         return None
-
 # 2. GUARDAR UN NUEVO ÍTEM
 def guardar_item(posicion, nombre, valor):
     try:
@@ -27,7 +25,7 @@ def guardar_item(posicion, nombre, valor):
         cursor = conn.cursor()
         # Usamos 'posicion' según tu diagrama de BD
         cursor.execute(
-            "INSERT INTO Transporte (posicion, nombre, valor) VALUES (?, ?, ?)",
+            "INSERT INTO transportes (posicion, nombre, valor) VALUES (?, ?, ?)",
             (posicion, nombre, valor)
         )
         conn.commit()
@@ -45,7 +43,7 @@ def traer_items():
         
         cursor = conn.cursor()
         # Seleccionamos las columnas reales de tu tabla
-        cursor.execute("SELECT posicion, nombre, valor FROM Transporte ORDER BY posicion ASC")
+        cursor.execute("SELECT posicion, nombre, valor FROM transportes ORDER BY posicion ASC")
         datos = cursor.fetchall()
         conn.close()
         
@@ -65,7 +63,7 @@ def borrar_item(posicion):
         if conn is None: return False
         
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM Transporte WHERE posicion = ?", (posicion,))
+        cursor.execute("DELETE FROM transportes WHERE posicion = ?", (posicion,))
         conn.commit()
         conn.close()
         return True
@@ -81,7 +79,7 @@ def existe_item(nombre, posicion):
         
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT * FROM Transporte WHERE nombre = ? OR posicion = ?",
+            "SELECT * FROM transportes WHERE nombre = ? OR posicion = ?",
             (nombre, posicion)
         )
         resultado = cursor.fetchone()
